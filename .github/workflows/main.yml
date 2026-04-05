@@ -169,10 +169,10 @@ jobs:
             echo "$CROSS_CHAIN"
             mkdir -p /tmp/crosschain
             cd /tmp/crosschain/
-            wget -nv "https://muslcc.alwaysdata.net/$CROSS_CHAIN-cross.tgz" -O musl.tar.gz
+            wget -nv "https://muslcc.alwaysdata.net/$CROSS_CHAIN-cross.tgz" -O "$CROSS_CHAIN-cross.tgz"
             wget -nv "https://muslcc.alwaysdata.net/SHA512SUMS"
             sha512sum -c SHA512SUMS --ignore-missing
-            tar -xzf musl.tar.gz
+            tar -xzf "$CROSS_CHAIN-cross.tgz"
             echo "$PWD/$CROSS_CHAIN-cross/bin" >> $GITHUB_PATH
           fi
       
