@@ -166,7 +166,7 @@ jobs:
             echo "$CROSS_CHAIN"
             mkdir -p /tmp/crosschain
             cd /tmp/crosschain/
-            wget -nv "https://musl.cc/$CROSS_CHAIN-cross.tgz" -o musl.tar.gz
+            wget "https://musl.cc/$CROSS_CHAIN-cross.tgz" -o musl.tar.gz
             tar -xzf musl.tar.gz
             echo "$PWD/$CROSS_CHAIN-cross/bin" >> $GITHUB_PATH
           fi
