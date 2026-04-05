@@ -91,21 +91,21 @@ jobs:
           
           - TARGET: aarch64-unknown-linux-musl
             OS: ubuntu-24.04-arm
-            CROSS_CHAIN: aarch64-linux-musl-native
+            #CROSS_CHAIN: aarch64-linux-musl-native
 
           - TARGET: armv7-unknown-linux-gnueabihf
             OS: ubuntu-latest
           
           - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
-            CROSS_CHAIN: arm-linux-musleabihf-cross
+            #CROSS_CHAIN: arm-linux-musleabihf-cross
           
           - TARGET: arm-unknown-linux-gnueabihf
             OS: ubuntu-latest
 
           - TARGET: arm-unknown-linux-musleabihf
             OS: ubuntu-latest
-            CROSS_CHAIN: arm-linux-musleabihf-cross
+            #CROSS_CHAIN: arm-linux-musleabihf-cross
           
           # - TARGET: aarch64-apple-darwin
           #   OS: macos-latest
@@ -150,26 +150,27 @@ jobs:
 
           # for arm targets
           if [[ $TARGET == "arm"* ]]; then
-            $APT install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf gcc-arm-linux-musleabihf
             cd "$REDLIB_ROOT_DIR"
             cargo install --force --locked bindgen-cli
           fi
-
-          #some additional configuration for cross-compilation on linux
-          cat >>~/.cargo/config.toml <<EOF
-          [target.armv7-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.armv7-unknown-linux-musleabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-musleabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [profile.release]
-          lto = false
-          [target.aarch64-unknown-linux-gnu]
-          rustflags = ["-C", "lto=no"]
-          EOF
+          
+          cargo install cross
+          
+          # #some additional configuration for cross-compilation on linux
+          # cat >>~/.cargo/config.toml <<EOF
+          # [target.armv7-unknown-linux-gnueabihf]
+          # linker = "arm-linux-gnueabihf-gcc"
+          # [target.armv7-unknown-linux-musleabihf]
+          # linker = "arm-linux-gnueabihf-gcc"
+          # [target.arm-unknown-linux-gnueabihf]
+          # linker = "arm-linux-gnueabihf-gcc"
+          # [target.arm-unknown-linux-musleabihf]
+          # linker = "arm-linux-gnueabihf-gcc"
+          # [profile.release]
+          # lto = false
+          # [target.aarch64-unknown-linux-gnu]
+          # rustflags = ["-C", "lto=no"]
+          # EOF
 
       - name: Install cross-chain
         run: |
@@ -191,7 +192,8 @@ jobs:
       - name: Run build
         run: |
           cd $REDLIB_ROOT_DIR
-          cargo build --release --target $TARGET
+          #cargo build --release --target $TARGET
+          cross build --release --target $TARGET
       
       - name: List build information
         run: |
