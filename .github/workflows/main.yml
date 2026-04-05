@@ -95,7 +95,7 @@ jobs:
           
           - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
-            CROSS_CHAIN: armv7l-linux-musleabihf-cross
+            CROSS_CHAIN: arm-linux-musleabihf-cross
           
           # - TARGET: arm-unknown-linux-gnueabihf
           #   OS: ubuntu-latest
