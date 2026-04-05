@@ -88,18 +88,21 @@ jobs:
           
           - TARGET: aarch64-unknown-linux-musl
             OS: ubuntu-24.04-arm
+            CROSS_CHAIN: aarch64-linux-musl
 
-          - TARGET: armv7-unknown-linux-gnueabihf
-            OS: ubuntu-latest
+          # - TARGET: armv7-unknown-linux-gnueabihf
+          #   OS: ubuntu-latest
           
           - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
+            CROSS_CHAIN: armv7l-linux-musleabihf
           
-          - TARGET: arm-unknown-linux-gnueabihf
-            OS: ubuntu-latest
+          # - TARGET: arm-unknown-linux-gnueabihf
+          #   OS: ubuntu-latest
 
           - TARGET: arm-unknown-linux-musleabihf
             OS: ubuntu-latest
+            CROSS_CHAIN: arm-linux-musleabihf
           
           - TARGET: aarch64-apple-darwin
             OS: macos-latest
@@ -166,7 +169,9 @@ jobs:
             echo "$CROSS_CHAIN"
             mkdir -p /tmp/crosschain
             cd /tmp/crosschain/
-            wget "https://muslcc.alwaysdata.net/$CROSS_CHAIN-cross.tgz" -O musl.tar.gz
+            wget -nv "https://muslcc.alwaysdata.net/$CROSS_CHAIN-cross.tgz" -O musl.tar.gz
+            wget -nv "https://muslcc.alwaysdata.net/SHA512SUMS"
+            sha512sum -c SHA512SUMS --ignore-missing
             tar -xzf musl.tar.gz
             echo "$PWD/$CROSS_CHAIN-cross/bin" >> $GITHUB_PATH
           fi
