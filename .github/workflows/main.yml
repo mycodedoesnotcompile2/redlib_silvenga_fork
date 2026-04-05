@@ -34,15 +34,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd /tmp/
-          REDLIB_PREBUILT_LATEST_TAG=$(gh release list -R mycodedoesnotcompile2/VMkatz_prebuilt_binary --json tagName -L 1 --jq '.[].tagName' --exclude-drafts --exclude-pre-releases)
+          REDLIB_PREBUILT_LATEST_TAG=$(gh release list -R mycodedoesnotcompile2/redib_silvenga_fork --json tagName -L 1 --jq '.[].tagName' --exclude-drafts --exclude-pre-releases)
           echo "REDLIB_PREBUILT_LATEST_TAG=$REDLIB_PREBUILT_LATEST_TAG" >> $GITHUB_OUTPUT
           echo "REDLIB_PREBUILT_LATEST_TAG=$REDLIB_PREBUILT_LATEST_TAG" >> $GITHUB_ENV
 
-      - name: Clone vmkatz repo and check if there is a new and uncompiled yet version
+      - name: Clone redlib repo and check if there is a new and uncompiled yet version
         id: release_commit_id
         run: |
           cd /tmp/
-          git clone "$REDLIB_REPO" vmkatz
+          git clone "$REDLIB_REPO" redlib
           git checkout "remotes/origin/switch-to-wreq"
 
           cd "$REDLIB_ROOT_DIR"
@@ -55,7 +55,7 @@ jobs:
             exit 100
           fi
 
-      - name: Get vmkatz version
+      - name: Get redlib version
         id: release_version_cargo_get
         uses: nicolaiunrein/cargo-get@master
         with:
@@ -124,7 +124,7 @@ jobs:
       REDLIB_VERSION: ${{ needs.checkout.outputs.REDLIB_VERSION }}
 
     steps:
-      - name: Clone vmkatz repo
+      - name: Clone redlib repo
         run: |
           cd /tmp/
           git clone "$REDLIB_REPO" redlib
@@ -170,7 +170,7 @@ jobs:
       
       - name: List build information
         run: |
-          OLD_REDLIB_BIN_PATH="$REDLIB_ROOT_DIR/target/$TARGET/release/vmkatz"
+          OLD_REDLIB_BIN_PATH="$REDLIB_ROOT_DIR/target/$TARGET/release/redlib"
 
           REDLIB_BIN_PATH="${{ runner.temp }}/$REDLIB_BIN_NAME-$REDLIB_VERSION-$TARGET"
           if [[ $OS =~ ^windows.*$ ]]; then
@@ -190,7 +190,7 @@ jobs:
           echo "REDLIB_BIN_HASH_PATH=$REDLIB_BIN_HASH_PATH" >> $GITHUB_ENV
 
 
-      - name: List VMKatz options 
+      - name: List redlib options 
         run: |
           "$REDLIB_BIN_PATH" -h || true
 
