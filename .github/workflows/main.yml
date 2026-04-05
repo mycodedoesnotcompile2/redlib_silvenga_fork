@@ -148,7 +148,9 @@ jobs:
             cargo install --force --locked bindgen-cli
           fi
 
+          
           if [[ -v $CROSS_CHAIN ]]; then 
+            echo "$CROSS_CHAIN"
             mkdir -p /tmp/crosschain
             cd /tmp/crosschain/
             wget -nv "$CROSS_CHAIN" -o musl.tar.gz
