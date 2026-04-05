@@ -9,7 +9,7 @@ The building workflow is [here](https://github.com/mycodedoesnotcompile2/redib_s
 
 See the [Github release page](https://github.com/mycodedoesnotcompile2/redib_silvenga_fork/releases/latest) of this repository to access prebuilt binaries for for different OSes (Linux, Windows, MacOS), different architectures (x64, arm64/7/5) and different libc (GNU, musl).
 
-For each release here, the tag corresponds to the latest short commit ID `git rev-parse --short HEAD` of the current latest main branch of VMKatz Github repository.
+For each release here, the tag corresponds to the latest short commit ID `git rev-parse --short HEAD` of the selected branch of the Silvenga redlib Github repository.
 
 Copyright and license
 ---------------------
