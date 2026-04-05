@@ -81,28 +81,28 @@ jobs:
           
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
-            CROSS_CHAIN: x86_64-linux-musl
+            CROSS_CHAIN: x86_64-linux-musl-cross
           
           - TARGET: aarch64-unknown-linux-gnu
             OS: ubuntu-24.04-arm
           
           - TARGET: aarch64-unknown-linux-musl
             OS: ubuntu-24.04-arm
-            CROSS_CHAIN: aarch64-linux-musl
+            CROSS_CHAIN: aarch64-linux-musl-native
 
           # - TARGET: armv7-unknown-linux-gnueabihf
           #   OS: ubuntu-latest
           
           - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
-            CROSS_CHAIN: armv7l-linux-musleabihf
+            CROSS_CHAIN: armv7l-linux-musleabihf-cross
           
           # - TARGET: arm-unknown-linux-gnueabihf
           #   OS: ubuntu-latest
 
           - TARGET: arm-unknown-linux-musleabihf
             OS: ubuntu-latest
-            CROSS_CHAIN: arm-linux-musleabihf
+            CROSS_CHAIN: arm-linux-musleabihf-cross
           
           - TARGET: aarch64-apple-darwin
             OS: macos-latest
@@ -169,12 +169,12 @@ jobs:
             echo "$CROSS_CHAIN"
             mkdir -p /tmp/crosschain
             cd /tmp/crosschain/
-            wget -nv "https://muslcc.alwaysdata.net/$CROSS_CHAIN-cross.tgz" -O "$CROSS_CHAIN-cross.tgz"
+            wget -nv "https://muslcc.alwaysdata.net/$CROSS_CHAIN.tgz" -O "$CROSS_CHAIN.tgz"
             wget -nv "https://muslcc.alwaysdata.net/SHA512SUMS"
             sha512sum -c SHA512SUMS --ignore-missing
-            tar -xzf "$CROSS_CHAIN-cross.tgz"
-            ls -alh "$PWD/$CROSS_CHAIN-cross/bin"
-            echo "$PWD/$CROSS_CHAIN-cross/bin" >> $GITHUB_PATH
+            tar -xzf "$CROSS_CHAIN.tgz"
+            ls -alh "$PWD/$CROSS_CHAIN/bin"
+            echo "$PWD/$CROSS_CHAIN/bin" >> $GITHUB_PATH
           fi
       
       - name: Install rust target
