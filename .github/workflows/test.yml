@@ -165,7 +165,8 @@ jobs:
           linker = "arm-linux-gnueabihf-gcc"
           [target.arm-unknown-linux-musleabihf]
           linker = "arm-linux-gnueabihf-gcc"
-          
+          [profile.release]
+          lto = false
           [target.aarch64-unknown-linux-gnu]
           rustflags = ["-C", "lto=no"]
           EOF
