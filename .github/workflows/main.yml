@@ -10,9 +10,9 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  VMKATZ_REPO: https://github.com/nikaiw/VMkatz.git
-  VMKATZ_ROOT_DIR: /tmp/vmkatz
-  VMKATZ_BIN_NAME: vmkatz
+  REDLIB_REPO: https://github.com/Silvenga/redlib.git
+  REDLIB_ROOT_DIR: /tmp/redlib
+  REDLIB_BIN_NAME: redlib-silvenga
   APT: sudo apt -y -qq -o=Dpkg::Use-Pty=0
 
 defaults:
@@ -23,9 +23,9 @@ jobs:
   checkout:
     runs-on: ubuntu-latest
     outputs:
-      VMKATZ_PREBUILT_LATEST_TAG: ${{ steps.release_latest_tag.outputs.VMKATZ_PREBUILT_LATEST_TAG }}
-      VMKATZ_CURRENT_COMMIT_ID: ${{ steps.release_commit_id.outputs.VMKATZ_CURRENT_COMMIT_ID }}
-      VMKATZ_VERSION: ${{ steps.release_version.outputs.VMKATZ_VERSION }}
+      REDLIB_PREBUILT_LATEST_TAG: ${{ steps.release_latest_tag.outputs.REDLIB_PREBUILT_LATEST_TAG }}
+      REDLIB_CURRENT_COMMIT_ID: ${{ steps.release_commit_id.outputs.REDLIB_CURRENT_COMMIT_ID }}
+      REDLIB_VERSION: ${{ steps.release_version.outputs.REDLIB_VERSION }}
 
     steps:
       - name: Get latest release tag of this repo
@@ -34,23 +34,23 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd /tmp/
-          VMKATZ_PREBUILT_LATEST_TAG=$(gh release list -R mycodedoesnotcompile2/VMkatz_prebuilt_binary --json tagName -L 1 --jq '.[].tagName' --exclude-drafts --exclude-pre-releases)
-          echo "VMKATZ_PREBUILT_LATEST_TAG=$VMKATZ_PREBUILT_LATEST_TAG" >> $GITHUB_OUTPUT
-          echo "VMKATZ_PREBUILT_LATEST_TAG=$VMKATZ_PREBUILT_LATEST_TAG" >> $GITHUB_ENV
+          REDLIB_PREBUILT_LATEST_TAG=$(gh release list -R mycodedoesnotcompile2/VMkatz_prebuilt_binary --json tagName -L 1 --jq '.[].tagName' --exclude-drafts --exclude-pre-releases)
+          echo "REDLIB_PREBUILT_LATEST_TAG=$REDLIB_PREBUILT_LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "REDLIB_PREBUILT_LATEST_TAG=$REDLIB_PREBUILT_LATEST_TAG" >> $GITHUB_ENV
 
       - name: Clone vmkatz repo and check if there is a new and uncompiled yet version
         id: release_commit_id
         run: |
           cd /tmp/
-          git clone --depth=1 "$VMKATZ_REPO" vmkatz
+          git clone "$REDLIB_REPO" vmkatz
+          git checkout "remotes/origin/switch-to-wreq"
 
-          cd "$VMKATZ_ROOT_DIR"
-          VMKATZ_CURRENT_COMMIT_ID=$(git rev-parse --short HEAD)
-          #echo "VMKATZ_CURRENT_COMMIT_ID=$VMKATZ_CURRENT_COMMIT_ID" >> $GITHUB_ENV
-          echo "VMKATZ_CURRENT_COMMIT_ID=$VMKATZ_CURRENT_COMMIT_ID" >> $GITHUB_OUTPUT
+          cd "$REDLIB_ROOT_DIR"
+          REDLIB_CURRENT_COMMIT_ID=$(git rev-parse --short HEAD)
+          echo "REDLIB_CURRENT_COMMIT_ID=$REDLIB_CURRENT_COMMIT_ID" >> $GITHUB_OUTPUT
 
           # case: no new commit => abort the workflow
-          if [[ $VMKATZ_PREBUILT_LATEST_TAG == $VMKATZ_CURRENT_COMMIT_ID ]]; then
+          if [[ $REDLIB_PREBUILT_LATEST_TAG == $REDLIB_CURRENT_COMMIT_ID ]]; then
             echo "[!] No new version to compile"
             exit 100
           fi
@@ -60,13 +60,13 @@ jobs:
         uses: nicolaiunrein/cargo-get@master
         with:
           subcommand: package.version
-          options: --entry "$VMKATZ_ROOT_DIR/Cargo.toml"
+          options: --entry "$REDLIB_ROOT_DIR/Cargo.toml"
 
-      - name: Set VMKATZ_VERSION build variable
+      - name: Set REDLIB_VERSION build variable
         id: release_version
         run: |
-          VMKATZ_VERSION=${{ steps.release_version_cargo_get.outputs.metadata }}
-          echo "VMKATZ_VERSION=$VMKATZ_VERSION" >> $GITHUB_OUTPUT
+          REDLIB_VERSION=${{ steps.release_version_cargo_get.outputs.metadata }}
+          echo "REDLIB_VERSION=$REDLIB_VERSION" >> $GITHUB_OUTPUT
 
 
 ##############
@@ -120,14 +120,15 @@ jobs:
       OS: ${{ matrix.OS }}
       CONTAINER: ${{ matrix.CONTAINER }}
       
-      VMKATZ_PREBUILT_LATEST_TAG: ${{ needs.checkout.outputs.VMKATZ_PREBUILT_LATEST_TAG }}
-      VMKATZ_VERSION: ${{ needs.checkout.outputs.VMKATZ_VERSION }}
+      REDLIB_PREBUILT_LATEST_TAG: ${{ needs.checkout.outputs.REDLIB_PREBUILT_LATEST_TAG }}
+      REDLIB_VERSION: ${{ needs.checkout.outputs.REDLIB_VERSION }}
 
     steps:
       - name: Clone vmkatz repo
         run: |
           cd /tmp/
-          git clone --depth=1 "$VMKATZ_REPO" vmkatz
+          git clone "$REDLIB_REPO" redlib
+          git checkout "remotes/origin/switch-to-wreq"
       
       - name: Install and configure dependencies
         run: |
@@ -143,7 +144,7 @@ jobs:
 
           # for arm targets
           if [[ $TARGET == "arm"* ]]; then
-            cd "$VMKATZ_ROOT_DIR"
+            cd "$REDLIB_ROOT_DIR"
             cargo install --force --locked bindgen-cli
           fi
 
@@ -164,34 +165,34 @@ jobs:
         
       - name: Run build
         run: |
-          cd $VMKATZ_ROOT_DIR
+          cd $REDLIB_ROOT_DIR
           cargo build --release --target $TARGET
       
       - name: List build information
         run: |
-          OLD_VMKATZ_BIN_PATH="$VMKATZ_ROOT_DIR/target/$TARGET/release/vmkatz"
+          OLD_REDLIB_BIN_PATH="$REDLIB_ROOT_DIR/target/$TARGET/release/vmkatz"
 
-          VMKATZ_BIN_PATH="${{ runner.temp }}/$VMKATZ_BIN_NAME-$VMKATZ_VERSION-$TARGET"
+          REDLIB_BIN_PATH="${{ runner.temp }}/$REDLIB_BIN_NAME-$REDLIB_VERSION-$TARGET"
           if [[ $OS =~ ^windows.*$ ]]; then
-            VMKATZ_BIN_PATH="${{ runner.temp }}/$VMKATZ_BIN_NAME-$VMKATZ_VERSION-$TARGET.exe"
+            REDLIB_BIN_PATH="${{ runner.temp }}/$REDLIB_BIN_NAME-$REDLIB_VERSION-$TARGET.exe"
           fi
-          VMKATZ_BIN_HASH_PATH="$VMKATZ_BIN_PATH.sha256.txt"
+          REDLIB_BIN_HASH_PATH="$REDLIB_BIN_PATH.sha256.txt"
           
-          cp -f "$OLD_VMKATZ_BIN_PATH" "$VMKATZ_BIN_PATH"
-          ls -alh "$VMKATZ_BIN_PATH"
-          ldd "$VMKATZ_BIN_PATH" || true
-          "$VMKATZ_BIN_PATH" -V || true
+          cp -f "$OLD_REDLIB_BIN_PATH" "$REDLIB_BIN_PATH"
+          ls -alh "$REDLIB_BIN_PATH"
+          ldd "$REDLIB_BIN_PATH" || true
+          "$REDLIB_BIN_PATH" -V || true
 
-          cd "$(dirname "$VMKATZ_BIN_PATH")"
-          sha256sum --tag "$(basename "$VMKATZ_BIN_PATH")" | tee "$VMKATZ_BIN_HASH_PATH"
+          cd "$(dirname "$REDLIB_BIN_PATH")"
+          sha256sum --tag "$(basename "$REDLIB_BIN_PATH")" | tee "$REDLIB_BIN_HASH_PATH"
           
-          echo "VMKATZ_BIN_PATH=$VMKATZ_BIN_PATH" >> $GITHUB_ENV
-          echo "VMKATZ_BIN_HASH_PATH=$VMKATZ_BIN_HASH_PATH" >> $GITHUB_ENV
+          echo "REDLIB_BIN_PATH=$REDLIB_BIN_PATH" >> $GITHUB_ENV
+          echo "REDLIB_BIN_HASH_PATH=$REDLIB_BIN_HASH_PATH" >> $GITHUB_ENV
 
 
       - name: List VMKatz options 
         run: |
-          "$VMKATZ_BIN_PATH" -h || true
+          "$REDLIB_BIN_PATH" -h || true
 
       
       - name: Upload artifact
@@ -199,8 +200,8 @@ jobs:
         with:
           name: binary-${{ matrix.TARGET }}
           path: |
-            ${{ env.VMKATZ_BIN_PATH }}
-            ${{ env.VMKATZ_BIN_HASH_PATH }}
+            ${{ env.REDLIB_BIN_PATH }}
+            ${{ env.REDLIB_BIN_HASH_PATH }}
 
 ##############
 
@@ -208,8 +209,8 @@ jobs:
     needs: [checkout, build]
     runs-on: ubuntu-latest
     env:
-       VMKATZ_CURRENT_COMMIT_ID: ${{ needs.checkout.outputs.VMKATZ_CURRENT_COMMIT_ID }}
-       VMKATZ_VERSION: ${{ needs.checkout.outputs.VMKATZ_VERSION }}
+       REDLIB_CURRENT_COMMIT_ID: ${{ needs.checkout.outputs.REDLIB_CURRENT_COMMIT_ID }}
+       REDLIB_VERSION: ${{ needs.checkout.outputs.REDLIB_VERSION }}
     
     steps:
      - name: Download Artifact
@@ -236,7 +237,7 @@ jobs:
        with:
          make_latest: true
          body_path: ${{ env.RELEASE_NOTES }}
-         name: version ${{ env.VMKATZ_VERSION }} - build ${{ env.VMKATZ_CURRENT_COMMIT_ID }}
-         tag_name: ${{ env.VMKATZ_CURRENT_COMMIT_ID }}
+         name: version ${{ env.REDLIB_VERSION }} - build ${{ env.REDLIB_CURRENT_COMMIT_ID }}
+         tag_name: ${{ env.REDLIB_CURRENT_COMMIT_ID }}
          files: |
-           /tmp/results/${{ env.VMKATZ_BIN_NAME }}-*
+           /tmp/results/${{ env.REDLIB_BIN_NAME }}-*
