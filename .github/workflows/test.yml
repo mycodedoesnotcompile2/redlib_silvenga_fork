@@ -150,7 +150,7 @@ jobs:
 
           # for arm targets
           if [[ $TARGET == "arm"* ]]; then
-            $APT install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            $APT install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf gcc-arm-linux-musleabihf
             cd "$REDLIB_ROOT_DIR"
             cargo install --force --locked bindgen-cli
           fi
