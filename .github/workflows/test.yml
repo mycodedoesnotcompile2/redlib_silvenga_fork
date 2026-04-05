@@ -48,11 +48,11 @@ jobs:
           REDLIB_CURRENT_COMMIT_ID=$(git rev-parse --short HEAD)
           echo "REDLIB_CURRENT_COMMIT_ID=$REDLIB_CURRENT_COMMIT_ID" >> $GITHUB_OUTPUT
 
-          # case: no new commit => abort the workflow
-          if [[ $REDLIB_PREBUILT_LATEST_TAG == $REDLIB_CURRENT_COMMIT_ID ]]; then
-            echo "[!] No new version to compile"
-            exit 100
-          fi
+          # # case: no new commit => abort the workflow
+          # if [[ $REDLIB_PREBUILT_LATEST_TAG == $REDLIB_CURRENT_COMMIT_ID ]]; then
+          #   echo "[!] No new version to compile"
+          #   exit 100
+          # fi
 
       - name: Get redlib version
         id: release_version_cargo_get
