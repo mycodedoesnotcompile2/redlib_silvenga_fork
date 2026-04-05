@@ -42,8 +42,7 @@ jobs:
         id: release_commit_id
         run: |
           cd /tmp/
-          git clone "$REDLIB_REPO" redlib
-          git checkout "remotes/origin/switch-to-wreq"
+          git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
 
           cd "$REDLIB_ROOT_DIR"
           REDLIB_CURRENT_COMMIT_ID=$(git rev-parse --short HEAD)
@@ -127,8 +126,7 @@ jobs:
       - name: Clone redlib repo
         run: |
           cd /tmp/
-          git clone "$REDLIB_REPO" redlib
-          git checkout "remotes/origin/switch-to-wreq"
+          git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
       
       - name: Install and configure dependencies
         run: |
