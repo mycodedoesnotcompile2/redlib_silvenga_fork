@@ -162,6 +162,9 @@ jobs:
           linker = "arm-linux-gnueabihf-gcc"
           [target.arm-unknown-linux-musleabihf]
           linker = "arm-linux-gnueabihf-gcc"
+          
+          [target.aarch64-unknown-linux-gnu]
+          rustflags = ["-C", "lto=no"]
           EOF
 
       - name: Install cross-chain
