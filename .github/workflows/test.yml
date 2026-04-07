@@ -139,10 +139,11 @@ jobs:
               $APT install crossbuild-essential-armhf
           fi
 
-          # # for musl builds
-          # if [[ $TARGET == *"-musl"* ]]; then
-          #   $APT install musl-tools
-          # fi
+          # for musl builds
+          if [[ $TARGET == *"-musl"* ]]; then
+              $APT update
+              $APT install musl-tools
+          fi
 
           # for arm targets
           if [[ $TARGET == "arm"* ]]; then
