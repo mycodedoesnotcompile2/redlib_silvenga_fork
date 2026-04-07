@@ -81,25 +81,24 @@ jobs:
           
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
-            CROSS_CHAIN: x86_64-linux-musl-cross
           
           - TARGET: aarch64-unknown-linux-gnu
             OS: ubuntu-24.04-arm
           
-           - TARGET: aarch64-unknown-linux-musl
-             OS: ubuntu-24.04-arm
+          - TARGET: aarch64-unknown-linux-musl
+            OS: ubuntu-24.04-arm
           
-           - TARGET: armv7-unknown-linux-gnueabihf
-             OS: ubuntu-latest
+          - TARGET: armv7-unknown-linux-gnueabihf
+            OS: ubuntu-latest
           
-           - TARGET: armv7-unknown-linux-musleabihf
-             OS: ubuntu-latest
+          - TARGET: armv7-unknown-linux-musleabihf
+            OS: ubuntu-latest
           
-           - TARGET: arm-unknown-linux-gnueabihf
-             OS: ubuntu-latest
+          - TARGET: arm-unknown-linux-gnueabihf
+            OS: ubuntu-latest
 
-           - TARGET: arm-unknown-linux-musleabihf
-             OS: ubuntu-latest
+          - TARGET: arm-unknown-linux-musleabihf
+            OS: ubuntu-latest
           
           - TARGET: aarch64-apple-darwin
             OS: macos-latest
@@ -110,8 +109,8 @@ jobs:
           - TARGET: x86_64-pc-windows-msvc
             OS: windows-latest
 
-           - TARGET: aarch64-pc-windows-msvc
-             OS: windows-11-arm
+          - TARGET: aarch64-pc-windows-msvc
+            OS: windows-11-arm
             
     runs-on: ${{ matrix.OS }}
 
