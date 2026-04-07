@@ -134,21 +134,22 @@ jobs:
       
       - name: Install and configure dependencies
         run: |
-          # if [[ $OS =~ ^ubuntu.*$ ]]; then
-          #   $APT update
-          #   $APT install crossbuild-essential-armhf
-          # fi
+          if [[ $OS =~ ^ubuntu.*$ ]]; then
+              $APT update
+              $APT install crossbuild-essential-armhf
+          fi
 
           # # for musl builds
           # if [[ $TARGET == *"-musl"* ]]; then
           #   $APT install musl-tools
           # fi
 
-          # # for arm targets
-          # if [[ $TARGET == "arm"* ]]; then
-          #   cd "$REDLIB_ROOT_DIR"
-          #   cargo install --force --locked bindgen-cli
-          # fi
+          # for arm targets
+          if [[ $TARGET == "arm"* ]]; then
+              $APT update
+              $APT install gcc-arm-linux-gnueabihf
+          fi
+          
           cd "$REDLIB_ROOT_DIR"
           cargo install --force bindgen-cli
           cargo install cross
@@ -191,6 +192,10 @@ jobs:
           if [[ $TARGET == *"-musl"* ]]; then
               COMPILER="cross"
           fi
+          if [[ $TARGET == "aarch64"* ]]; then
+              COMPILER="cargo"
+          fi
+          
           cd $REDLIB_ROOT_DIR
           $COMPILER build --release --target $TARGET
       
