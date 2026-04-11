@@ -88,8 +88,8 @@ jobs:
           - TARGET: aarch64-unknown-linux-musl
             OS: ubuntu-latest
           
-          # - TARGET: armv7-unknown-linux-gnueabihf
-          #   OS: ubuntu-latest
+          - TARGET: armv7-unknown-linux-gnueabihf
+            OS: ubuntu-latest
           
           # - TARGET: armv7-unknown-linux-musleabihf
           #   OS: ubuntu-latest
