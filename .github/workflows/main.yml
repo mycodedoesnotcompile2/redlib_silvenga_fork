@@ -1,9 +1,9 @@
 name: Build binaries
 
 on:
-  #workflow_dispatch
-  schedule:
-    - cron: '5 5 * * *'
+  workflow_dispatch
+  #schedule:
+  #  - cron: '5 5 * * *'
 
 permissions:
   contents: write
@@ -81,28 +81,24 @@ jobs:
           
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
-            CROSS_CHAIN: x86_64-linux-musl-cross
           
           - TARGET: aarch64-unknown-linux-gnu
             OS: ubuntu-24.04-arm
           
-          # - TARGET: aarch64-unknown-linux-musl
-          #   OS: ubuntu-24.04-arm
-          #   CROSS_CHAIN: aarch64-linux-musl-native
-
-          # - TARGET: armv7-unknown-linux-gnueabihf
-          #   OS: ubuntu-latest
+          - TARGET: aarch64-unknown-linux-musl
+            OS: ubuntu-24.04-arm
           
-          # - TARGET: armv7-unknown-linux-musleabihf
-          #   OS: ubuntu-latest
-          #   CROSS_CHAIN: arm-linux-musleabihf-cross
+          - TARGET: armv7-unknown-linux-gnueabihf
+            OS: ubuntu-latest
           
-          # - TARGET: arm-unknown-linux-gnueabihf
-          #   OS: ubuntu-latest
+          - TARGET: armv7-unknown-linux-musleabihf
+            OS: ubuntu-latest
+          
+          - TARGET: arm-unknown-linux-gnueabihf
+            OS: ubuntu-latest
 
-          # - TARGET: arm-unknown-linux-musleabihf
-          #   OS: ubuntu-latest
-          #   CROSS_CHAIN: arm-linux-musleabihf-cross
+          - TARGET: arm-unknown-linux-musleabihf
+            OS: ubuntu-latest
           
           - TARGET: aarch64-apple-darwin
             OS: macos-latest
@@ -113,8 +109,8 @@ jobs:
           - TARGET: x86_64-pc-windows-msvc
             OS: windows-latest
 
-          # - TARGET: aarch64-pc-windows-msvc
-          #   OS: windows-11-arm
+          - TARGET: aarch64-pc-windows-msvc
+            OS: windows-latest
             
     runs-on: ${{ matrix.OS }}
 
@@ -122,7 +118,6 @@ jobs:
       TARGET: ${{ matrix.TARGET }}
       OS: ${{ matrix.OS }}
       CONTAINER: ${{ matrix.CONTAINER }}
-      CROSS_CHAIN: ${{ matrix.CROSS_CHAIN }}
       
       REDLIB_PREBUILT_LATEST_TAG: ${{ needs.checkout.outputs.REDLIB_PREBUILT_LATEST_TAG }}
       REDLIB_VERSION: ${{ needs.checkout.outputs.REDLIB_VERSION }}
@@ -132,6 +127,9 @@ jobs:
         run: |
           cd /tmp/
           git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
+
+      - name: Install rust target
+        run: rustup target add $TARGET
       
       - name: Install and configure dependencies
         run: |
@@ -142,14 +140,20 @@ jobs:
 
           # for musl builds
           if [[ $TARGET == *"-musl"* ]]; then
+            $APT update
             $APT install musl-tools
           fi
 
           # for arm targets
           if [[ $TARGET == "arm"* ]]; then
             cd "$REDLIB_ROOT_DIR"
-            cargo install --force --locked bindgen-cli
+            $APT update
+            $APT install gcc-arm-linux-gnueabihf
           fi
+
+          cd "$REDLIB_ROOT_DIR"
+          cargo install --force bindgen-cli
+          cargo install cross
 
           # some additional configuration for cross-compilation on linux
           # cat >>~/.cargo/config.toml <<EOF
@@ -163,27 +167,19 @@ jobs:
           # linker = "arm-linux-gnueabihf-gcc"
           # EOF
 
-      - name: Install cross-chain
-        run: |
-          if [[ -n "$CROSS_CHAIN" ]]; then 
-            echo "$CROSS_CHAIN"
-            mkdir -p /tmp/crosschain
-            cd /tmp/crosschain/
-            wget -nv "https://muslcc.alwaysdata.net/$CROSS_CHAIN.tgz" -O "$CROSS_CHAIN.tgz"
-            wget -nv "https://muslcc.alwaysdata.net/SHA512SUMS"
-            sha512sum -c SHA512SUMS --ignore-missing
-            tar -xzf "$CROSS_CHAIN.tgz"
-            ls -alh "$PWD/$CROSS_CHAIN/bin"
-            echo "$PWD/$CROSS_CHAIN/bin" >> $GITHUB_PATH
-          fi
-      
-      - name: Install rust target
-        run: rustup target add $TARGET
         
       - name: Run build
         run: |
+          COMPILER="cargo"
+          if [[ $TARGET == *"-musl"* ]]; then
+              COMPILER="cross"
+          fi
+          if [[ $TARGET == "aarch64"* ]]; then
+              COMPILER="cargo"
+          fi
+          
           cd $REDLIB_ROOT_DIR
-          cargo build --release --target $TARGET
+          $COMPILER build --release --target $TARGET
       
       - name: List build information
         run: |
