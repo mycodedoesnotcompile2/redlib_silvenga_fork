@@ -153,7 +153,7 @@ jobs:
           # for musl builds
           if [[ $TARGET == *"-musl"* ]]; then
               $APT update
-              $APT install musl-tools gcc-aarch64-linux-gnu
+              $APT install musl-tools gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
           fi
 
           # for arm targets
@@ -162,11 +162,13 @@ jobs:
               $APT install gcc-arm-linux-gnueabihf
           fi
 
-          ls -alh /usr/bin/aarch64* || true
+         
           
           cd "$REDLIB_ROOT_DIR"
           cargo install --force bindgen-cli
           cargo install cross
+
+          ls -alh /usr/bin/aarch64* || true
           
           #some additional configuration for cross-compilation on linux
           cat >>~/.cargo/config.toml <<EOF
