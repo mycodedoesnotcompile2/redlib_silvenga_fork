@@ -135,7 +135,6 @@ jobs:
 
       - name: Install rust target
         run: |
-          rustup toolchain install stable-aarch64-unknown-linux-gnu --force-non-host
           rustup default stable --force-non-host
           rustup target add $TARGET
       
@@ -165,7 +164,7 @@ jobs:
           cargo install --force bindgen-cli
           cargo install cross
 
-          wget -nv "https://github.com/nikaiw/VMkatz/raw/refs/heads/main/Cross.toml" -O ~/.config/cross/cross.toml
+          wget -nv "https://github.com/nikaiw/VMkatz/raw/refs/heads/main/Cross.toml" -O /tmp/cross.toml
           
           # #some additional configuration for cross-compilation on linux
           # cat >>~/.cargo/config.toml <<EOF
@@ -200,7 +199,7 @@ jobs:
       - name: Run build
         run: |         
           cd $REDLIB_ROOT_DIR
-          #$COMPILER build --release --target $TARGET
+          CROSS_CONFIG=/tmp/cross.toml $COMPILER build --release --target $TARGET
       
       - name: List build information
         run: |
