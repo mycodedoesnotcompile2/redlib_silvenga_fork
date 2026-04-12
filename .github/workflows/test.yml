@@ -137,13 +137,17 @@ jobs:
           git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
 
       - name: Install rust target
-        run: rustup target add $TARGET
+        run: |
+          rustup toolchain install stable-aarch64-unknown-linux-gnu
+          rustup default stable
+          rustup target add $TARGET
       
       - name: Install and configure dependencies
         run: |
           if [[ $OS =~ ^ubuntu.*$ ]]; then
               $APT update
               $APT install crossbuild-essential-armhf gcc-aarch64-linux-gnu
+              ls -alh $(which aarch64-linux-musl-gcc)
           fi
 
           # for musl builds
