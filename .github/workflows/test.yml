@@ -200,7 +200,9 @@ jobs:
       - name: Run build
         run: |         
           cd $REDLIB_ROOT_DIR
-          $COMPILER build --release --target $TARGET
+          cargo install cargo-zigbuild
+          cargo zigbuild --release --target $TARGET
+          #$COMPILER build --release --target $TARGET
       
       - name: List build information
         run: |
