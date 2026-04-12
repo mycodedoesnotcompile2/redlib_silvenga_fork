@@ -75,7 +75,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
+        TARGET: [aarch64-unknown-linux-musl, armv7-unknown-linux-gnueabihf, arm-unknown-linux-gnueabihf]
+        OS: [ubuntu-latest, ubuntu-24.04-arm]
+        COMPILER: [cargo, cross]
+        #include:
           # - TARGET: x86_64-unknown-linux-gnu
           #   OS: ubuntu-latest
           
@@ -84,19 +87,22 @@ jobs:
           
           # - TARGET: aarch64-unknown-linux-gnu
           #   OS: ubuntu-24.04-arm
+          #########################################
+          # - TARGET: aarch64-unknown-linux-musl
+          #   OS: ubuntu-latest
+          #   COMPILER: cross
           
-          - TARGET: aarch64-unknown-linux-musl
-            OS: ubuntu-latest
-          
-          - TARGET: armv7-unknown-linux-gnueabihf
-            OS: ubuntu-latest
-          
+          # - TARGET: armv7-unknown-linux-gnueabihf
+          #   OS: ubuntu-latest
+          #   COMPILER: cargo
+
+          # - TARGET: arm-unknown-linux-gnueabihf
+          #   OS: ubuntu-latest
+          #   COMPILER: cargo
+          #########################################
           # - TARGET: armv7-unknown-linux-musleabihf
           #   OS: ubuntu-latest
           
-          - TARGET: arm-unknown-linux-gnueabihf
-            OS: ubuntu-latest
-
           # - TARGET: arm-unknown-linux-musleabihf
           #   OS: ubuntu-latest
           
@@ -111,6 +117,7 @@ jobs:
 
           # - TARGET: aarch64-pc-windows-msvc
           #   OS: windows-latest
+          #########################################
             
     runs-on: ${{ matrix.OS }}
 
@@ -118,7 +125,7 @@ jobs:
       TARGET: ${{ matrix.TARGET }}
       OS: ${{ matrix.OS }}
       CONTAINER: ${{ matrix.CONTAINER }}
-      #CROSS_CHAIN: ${{ matrix.CROSS_CHAIN }}
+      COMPILER: ${{ matrix.COMPILER }}
       
       REDLIB_PREBUILT_LATEST_TAG: ${{ needs.checkout.outputs.REDLIB_PREBUILT_LATEST_TAG }}
       REDLIB_VERSION: ${{ needs.checkout.outputs.REDLIB_VERSION }}
@@ -188,15 +195,7 @@ jobs:
 
         
       - name: Run build
-        run: |
-          COMPILER="cargo"
-          if [[ $TARGET == *"-musl"* ]]; then
-              COMPILER="cross"
-          fi
-          if [[ $TARGET == "aarch64"* ]]; then
-              COMPILER="cargo"
-          fi
-          
+        run: |         
           cd $REDLIB_ROOT_DIR
           $COMPILER build --release --target $TARGET
       
