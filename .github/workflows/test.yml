@@ -143,7 +143,7 @@ jobs:
         run: |
           if [[ $OS =~ ^ubuntu.*$ ]]; then
               $APT update
-              $APT install crossbuild-essential-armhf 
+              $APT install crossbuild-essential-armhf gcc-aarch64-linux-gnu
           fi
 
           # for musl builds
