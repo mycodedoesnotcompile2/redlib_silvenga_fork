@@ -1,9 +1,9 @@
 name: Build binaries
 
 on:
-  #workflow_dispatch
-  schedule:
-    - cron: '5 5 * * *'
+  workflow_dispatch
+  # schedule:
+  #   - cron: '5 5 * * *'
 
 permissions:
   contents: write
@@ -42,7 +42,8 @@ jobs:
         id: release_commit_id
         run: |
           cd /tmp/
-          git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
+          #git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
+          git clone --depth=1 "$REDLIB_REPO"
 
           cd "$REDLIB_ROOT_DIR"
           REDLIB_CURRENT_COMMIT_ID=$(git rev-parse --short HEAD)
@@ -137,7 +138,8 @@ jobs:
       - name: Clone redlib repo
         run: |
           cd /tmp/
-          git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
+          #git clone "$REDLIB_REPO" --branch "switch-to-wreq" --single-branch redlib
+          git clone --depth=1 "$REDLIB_REPO"
 
       - name: Install rust target
         run: rustup target add $TARGET
